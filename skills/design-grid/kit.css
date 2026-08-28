@@ -1,0 +1,188 @@
+/* ==========================================================================
+   design-grid kit.css
+   Two layers:
+     1. Page shell  — the dark chrome around the grid. Fixed, never themed.
+     2. Cell layer  — every primitive derives from the variable contract, so a
+                      row supplying vars changes color, density, type scale and
+                      roundness without touching a renderer.
+   NOTHING inside the cell layer hardcodes a size, space, or radius.
+   ========================================================================== */
+
+/* ---------- 1. page shell ---------- */
+
+:root{
+  --page-bg:#111214;
+  --page-fg:#e7e8ea;
+  --page-dim:#9a9ba1;
+  --page-line:#26272b;
+  --cw:384px;              /* cell width  */
+  --ch:300px;              /* cell height */
+  --gap:16px;
+  --headw:132px;           /* row-header column width */
+  --maxw:1980px;
+  font-family:ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, sans-serif;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  background:var(--page-bg);
+  color:var(--page-fg);
+  padding:32px 28px 70px;
+  -webkit-font-smoothing:antialiased;
+}
+
+.head{ margin:0 auto 24px; max-width:var(--maxw); }
+.head h1{ font-size:21px; font-weight:650; margin:0 0 5px; letter-spacing:-.012em; }
+.head p{ margin:0; font-size:13.5px; color:var(--page-dim); max-width:82ch; line-height:1.55; }
+
+.scroll{ overflow-x:auto; padding-bottom:12px; }
+.gridwrap{ display:grid; gap:var(--gap); align-items:stretch; margin:0 auto; }
+
+.colhead{
+  font-size:13px; font-weight:600; color:#f0f0f2;
+  padding:2px 4px 8px; align-self:end; letter-spacing:-.005em; line-height:1.3;
+}
+.colhead .cd{
+  display:block; font-weight:400; font-size:11px;
+  color:#8a8b91; margin-top:3px; line-height:1.35;
+}
+
+.rowhead{ display:flex; flex-direction:column; justify-content:center; gap:8px; padding-right:8px; }
+.rowhead .rn{ font-size:13px; font-weight:600; color:#f0f0f2; line-height:1.25; }
+.rowhead .rd{ font-size:11px; color:#8a8b91; line-height:1.4; }
+.rowhead .sw{ display:flex; gap:4px; flex-wrap:wrap; }
+.rowhead .sw span{ width:13px; height:13px; border-radius:3px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.14); }
+
+.note{ max-width:var(--maxw); margin:26px auto 0; font-size:13px; color:var(--page-dim); line-height:1.6; }
+.note p{ margin:0 0 13px; max-width:100ch; }
+.note p:last-child{ margin-bottom:0; }
+.note b{ color:var(--page-fg); font-weight:600; }
+.note hr{ border:0; border-top:1px solid var(--page-line); margin:20px 0; }
+
+/* ---------- 2. cell layer: the variable contract ---------- */
+
+.cell{
+  /* colour */
+  --bg:#0a0a0b;
+  --surface:#151517;
+  --hair:rgba(255,255,255,.08);
+  --text:#ece9e2;
+  --textdim:#6b6b70;
+  --accent:#7cf6a0;
+  --accent2:#7dd3fc;
+  --red:#f26d6d;
+  --addbg:rgba(124,246,160,.14);
+  --delbg:rgba(242,109,109,.13);
+
+  /* metrics — every space, size and radius below is a multiple of these */
+  --r:5px;                          /* corner radius        */
+  --u:4px;                          /* base spacing unit    */
+  --fs:6px;                         /* base text-block height */
+  --wk:1;                           /* text-block width scale */
+  --gutter:calc(var(--u) * 2.5);    /* content padding      */
+
+  /* derived chrome metrics */
+  --rail:calc(var(--u) * 7.5);
+  --topbar:calc(var(--u) * 5.5);
+  --icon:calc(var(--u) * 3.75);
+
+  /* real-type metrics, used by focal / hifi cells only */
+  --type:13px;
+  --lh:1.45;
+  --font:inherit;
+}
+
+/* ---------- window chrome ---------- */
+
+.win{
+  background:var(--bg);
+  border-radius:calc(var(--r) + 4px);
+  overflow:hidden;
+  height:var(--ch);
+  display:flex;
+  box-shadow:0 8px 22px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.4);
+}
+.win.plain{ display:block; }
+
+.side{
+  width:var(--rail); flex:none;
+  background:var(--surface);
+  border-right:1px solid var(--hair);
+  padding:calc(var(--u) * 1.5) 0;
+  display:flex; flex-direction:column; align-items:center;
+  gap:calc(var(--u) * 1.5);
+}
+.side .logo{ width:var(--icon); height:var(--icon); border-radius:calc(var(--r) - 1px); background:var(--text); flex:none; }
+.side .ni{ width:var(--icon); height:var(--icon); border-radius:calc(var(--r) - 1px); background:var(--textdim); opacity:.5; flex:none; }
+.side .ni.on{ background:var(--accent); opacity:1; }
+
+.main{ flex:1; min-width:0; display:flex; flex-direction:column; }
+
+.top{
+  height:var(--topbar); flex:none;
+  border-bottom:1px solid var(--hair);
+  display:flex; align-items:center;
+  gap:calc(var(--u) * 1.25); padding:0 calc(var(--u) * 1.75);
+}
+.top .org,
+.top .srch{
+  height:calc(var(--fs) * 1.85); border-radius:999px;
+  background:var(--surface); box-shadow:inset 0 0 0 1px var(--hair); flex:none;
+}
+.top .org{ width:calc(48px * var(--wk)); }
+.top .srch{ width:calc(110px * var(--wk)); }
+.top .ic{ width:calc(var(--u) * 2.5); height:calc(var(--u) * 2.5); border-radius:50%; background:var(--textdim); opacity:.55; flex:none; }
+.top .av{ width:calc(var(--u) * 3); height:calc(var(--u) * 3); border-radius:50%; background:var(--accent2); flex:none; }
+
+.content{ flex:1; padding:calc(var(--gutter) * .9) var(--gutter); overflow:hidden; position:relative; }
+
+/* browser + phone frames */
+.chrome{ background:var(--surface); border-bottom:1px solid var(--hair); display:flex; align-items:center;
+         gap:calc(var(--u) * 1.5); padding:calc(var(--u) * 1.25) calc(var(--u) * 2); flex:none; }
+.chrome .dots{ display:flex; gap:calc(var(--u) * .75); }
+.chrome .dots i{ width:calc(var(--u) * 1.5); height:calc(var(--u) * 1.5); border-radius:50%; background:var(--textdim); opacity:.45; }
+.chrome .url{ flex:1; height:calc(var(--fs) * 1.6); border-radius:999px; background:var(--bg); box-shadow:inset 0 0 0 1px var(--hair); }
+.phone{ border-radius:calc(var(--r) + 12px); box-shadow:inset 0 0 0 2px var(--hair), 0 8px 22px rgba(0,0,0,.5); }
+.phone .notch{ height:calc(var(--u) * 3); display:flex; align-items:center; justify-content:center; flex:none; }
+.phone .notch i{ width:calc(var(--u) * 9); height:calc(var(--u) * 1.25); border-radius:999px; background:var(--textdim); opacity:.4; }
+
+/* ---------- primitives ---------- */
+
+.t{ background:var(--text);    border-radius:var(--r); flex:none; }
+.d{ background:var(--textdim); border-radius:var(--r); flex:none; }
+.a{ background:var(--accent);  border-radius:var(--r); flex:none; }
+.a2{ background:var(--accent2);border-radius:var(--r); flex:none; }
+.card{ background:var(--surface); border-radius:var(--r); box-shadow:inset 0 0 0 1px var(--hair); }
+.pill{ border-radius:999px; }
+.row{ display:flex; align-items:center; }
+.col{ display:flex; flex-direction:column; }
+.grow{ flex:1; min-width:0; }
+.hairline{ border-top:1px solid var(--hair); }
+
+.btnA{ background:var(--accent);  border-radius:calc(var(--r) + 2px); }
+.btnB{ background:var(--accent2); border-radius:calc(var(--r) + 2px); }
+.btnG{ background:transparent;    border-radius:calc(var(--r) + 2px); box-shadow:inset 0 0 0 1px var(--textdim); }
+
+/* code diff */
+.cl{ display:flex; align-items:center; gap:calc(var(--u) * 1.25); height:calc(var(--fs) * 2.2); padding:0 var(--u); }
+.cl .ln{ width:calc(var(--u) * 2.25); height:calc(var(--fs) * .83); border-radius:1px; background:var(--textdim); opacity:.5; flex:none; }
+.cl .sgn{ width:var(--u); height:var(--u); border-radius:1px; flex:none; }
+.cl.del{ background:var(--delbg); }
+.cl.add{ background:var(--addbg); }
+.cl.del .sgn{ background:var(--red); }
+.cl.add .sgn{ background:var(--accent); }
+
+svg{ display:block; width:100%; height:100%; }
+
+/* ---------- real type, for focal / hifi cells ---------- */
+
+.rt{ font-family:var(--font); color:var(--text); font-size:var(--type); line-height:var(--lh); }
+.rt-dim{ color:var(--textdim); }
+.rt-acc{ color:var(--accent); }
+.rt h1,.rt h2,.rt h3,.rt p{ margin:0; }
+.rt h1{ font-size:calc(var(--type) * 2.2);  line-height:1.1;  letter-spacing:-.02em; font-weight:700; }
+.rt h2{ font-size:calc(var(--type) * 1.55); line-height:1.2;  letter-spacing:-.015em; font-weight:650; }
+.rt h3{ font-size:calc(var(--type) * 1.15); line-height:1.3;  font-weight:600; }
+.rt small{ font-size:calc(var(--type) * .8); }

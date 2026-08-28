@@ -1,0 +1,34 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "ike",
+  "metadata": {
+    "description": "ʻIke (Hawaiian: knowledge, understanding) — Kyle Scully's Claude Code commands in one place."
+  },
+  "owner": {
+    "name": "Kyle Scully",
+    "email": "scullykns@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "ike",
+      "source": "./",
+      "description": "ʻIke — comment and test pruning, design critique, two-axis design grids, and a PR description template.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Kyle Scully",
+        "email": "scullykns@gmail.com"
+      },
+      "homepage": "https://github.com/zieka/ike",
+      "license": "MIT",
+      "category": "workflow",
+      "tags": [
+        "commands",
+        "code-review",
+        "comments",
+        "tests",
+        "design",
+        "pull-requests"
+      ]
+    }
+  ]
+}

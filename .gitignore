@@ -1,0 +1,15 @@
+# Design/planning artifacts — local only, not part of the published plugin
+docs/superpowers/
+task_plan.md
+findings.md
+progress.md
+
+# Moderne MCP generated artifacts (LST cache, generated skills)
+.moderne/
+.claude/skills/
+.claude/settings.local.json
+
+# OS / tooling noise
+.DS_Store
+__pycache__/
+*.pyc
