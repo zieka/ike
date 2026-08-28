@@ -1,6 +1,6 @@
 {
   "name": "ike",
-  "description": "ʻIke — comment and test pruning, design critique, two-axis design grids, and a PR description template.",
+  "description": "Commands for code hygiene, design critique and exploration, and pull request authoring.",
   "version": "0.1.0",
   "author": {
     "name": "Kyle Scully",

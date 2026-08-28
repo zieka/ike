@@ -1,5 +1,4 @@
 ---
-name: reduce-tests
 description: Prune tests TDD left behind — keep only those that name a specific bug they would catch in production.
 ---
 

@@ -1,6 +1,7 @@
 ---
 name: design-grid
-description: Build a two-axis grid of design variants as a standalone .html file — themes × screens, density × layout, fonts × components, or any two dimensions. Use when the user wants to compare design options side by side, explore a design space, or invokes /ike:design-grid.
+description: Build a two-axis grid of design variants as a standalone .html file — themes × screens, density × layout, fonts × components. Use to compare design options side by side or explore a design space.
+argument-hint: "[rows axis] × [cols axis]"
 ---
 
 # Design Grid
@@ -27,6 +28,8 @@ descriptions`, not `Dense`. A gradient you cannot read the mechanism off is a bl
 
 **Only one axis given?** Propose a complementary second one. If declined, build a single-row
 strip (omit `ROWS` entirely — the runtime drops the header column).
+
+**No axes given?** Ask what design space to explore. Do not guess.
 
 ### 2. Pick a fidelity mode
 
@@ -89,12 +92,9 @@ separate code path.
 ### 5. Build
 
 ```bash
-python3 <skill-dir>/build.py <spec.js> \
+python3 ${CLAUDE_SKILL_DIR}/build.py <spec.js> \
   -o ~/Documents/design-grids/YYYY-MM-DD-<rows>-x-<cols>.html --check
 ```
-
-`<skill-dir>` is the base directory the runtime reports when this skill loads.
-Fall back to `${CLAUDE_PLUGIN_ROOT}/skills/design-grid` if it reports none.
 
 **Always pass `--check`.** It evaluates the bundle under a DOM stub in node and fails on any
 cell that throws, before the user opens anything.

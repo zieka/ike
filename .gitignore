@@ -4,7 +4,8 @@ task_plan.md
 findings.md
 progress.md
 
-# Moderne MCP generated artifacts (LST cache, generated skills)
+# Generated locally, never part of the plugin. Global ignores don't survive a clone.
+# Note: .claude/skills/ is Moderne MCP's generated skills, NOT this plugin's top-level skills/
 .moderne/
 .claude/skills/
 .claude/settings.local.json

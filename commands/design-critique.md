@@ -1,6 +1,5 @@
 ---
-name: design-critique
-description: do a design critique 
+description: Adversarial design critique in the style of Connor & Irizarry's Discussing Design.
 ---
 
 Start a design critique in the style of Adam Connor & Aaron Irizarry’s Discussing Design.

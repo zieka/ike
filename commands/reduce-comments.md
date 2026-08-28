@@ -1,5 +1,4 @@
 ---
-name: reduce-comments
 description: Cut new code comments down to what earns its place — why over what, inline over doc blocks, standard labels.
 ---
 

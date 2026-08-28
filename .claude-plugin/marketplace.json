@@ -12,23 +12,8 @@
     {
       "name": "ike",
       "source": "./",
-      "description": "ʻIke — comment and test pruning, design critique, two-axis design grids, and a PR description template.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Kyle Scully",
-        "email": "scullykns@gmail.com"
-      },
-      "homepage": "https://github.com/zieka/ike",
-      "license": "MIT",
-      "category": "workflow",
-      "tags": [
-        "commands",
-        "code-review",
-        "comments",
-        "tests",
-        "design",
-        "pull-requests"
-      ]
+      "description": "Commands for code hygiene, design critique and exploration, and pull request authoring.",
+      "category": "workflow"
     }
   ]
 }
