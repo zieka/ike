@@ -31,6 +31,10 @@ single self-contained `.html` file under `~/Documents/design-grids/`.
 Requires `python3` and `node`. Node runs the `--check` pass, which evaluates
 every cell under a DOM stub before you open anything.
 
+## Contributing
+
+`python3 scripts/validate.py` before you push. CI runs it on every PR.
+
 ## License
 
 MIT
