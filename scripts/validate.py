@@ -23,11 +23,12 @@ def frontmatter(path: pathlib.Path) -> dict[str, str]:
     if not text.startswith("---"):
         return {}
     block = text.split("---", 2)[1]
-    return dict(re.findall(r"^([A-Za-z-]+):\s*(.*)$", block, re.M))
+    return dict(re.findall(r"^([A-Za-z0-9_-]+):\s*(.*)$", block, re.M))
 
 
 commands = sorted(ROOT.glob("commands/*.md"))
 skills = sorted(ROOT.glob("skills/*/SKILL.md"))
+styles = sorted(ROOT.glob("output-styles/*.md"))
 
 # 1. Manifests parse and carry what the marketplace schema requires.
 for rel, required in [
@@ -64,18 +65,25 @@ for cmd in commands:
         )
 
 # 3. Every entry needs a description; it is what the picker shows.
-for path in commands + skills:
+for path in commands + skills + styles:
     desc = frontmatter(path).get("description", "").strip()
     if not desc:
         err(str(path.relative_to(ROOT)), "empty or missing `description:` frontmatter")
 
 # 4. Absolute ~/.claude paths do not exist once installed as a plugin.
-for path in commands + skills:
+for path in commands + skills + styles:
     for n, line in enumerate(path.read_text().splitlines(), 1):
         if "~/.claude/" in line:
             err(f"{path.relative_to(ROOT)}:{n}", "hardcoded ~/.claude path breaks inside a plugin")
 
-# 5. Marketplace entries must not restate plugin.json metadata; the two drift.
+# 5. Output-style frontmatter keys are ignored silently when misspelled.
+#    A typo in `keep-coding-instructions` drops the coding prompt with no warning.
+STYLE_KEYS = {"name", "description", "keep-coding-instructions", "force-for-plugin"}
+for path in styles:
+    for key in frontmatter(path).keys() - STYLE_KEYS:
+        err(str(path.relative_to(ROOT)), f"unknown frontmatter key {key!r}")
+
+# 6. Marketplace entries must not restate plugin.json metadata; the two drift.
 try:
     pj = json.loads((ROOT / ".claude-plugin/plugin.json").read_text())
     mj = json.loads((ROOT / ".claude-plugin/marketplace.json").read_text())
@@ -91,7 +99,7 @@ try:
 except (OSError, json.JSONDecodeError):
     pass  # already reported in check 1
 
-print(f"checked {len(commands)} command(s), {len(skills)} skill(s)")
+print(f"checked {len(commands)} command(s), {len(skills)} skill(s), {len(styles)} output style(s)")
 if errors:
     print(f"\n{len(errors)} problem(s):", file=sys.stderr)
     for e in errors:
