@@ -20,6 +20,7 @@ A Claude Code plugin marketplace for the commands I actually use.
 | command | `/ike:design-critique` | red-teaming a design |
 | command | `/ike:pr-description-template` | writing a PR body |
 | skill | `/ike:design-grid` | comparing design variants |
+| output style | `/output-style` → `ike:Laconic` | fewest words, plain language |
 
 Each carries its own description — `/help` and the command picker show them.
 
@@ -30,6 +31,14 @@ single self-contained `.html` file under `~/Documents/design-grids/`.
 
 Requires `python3` and `node`. Node runs the `--check` pass, which evaluates
 every cell under a DOM stub before you open anything.
+
+## Laconic
+
+Output style: fewest words that keep the meaning. Leads from knowns to a point,
+defines terms, favors symbols (→ ⇒ ≈). Keeps Claude Code's coding instructions.
+
+Pick it in `/output-style`, or set `"outputStyle": "ike:Laconic"` in
+`settings.json`. The name is case-sensitive; `ike:laconic` silently does nothing.
 
 ## Contributing
 

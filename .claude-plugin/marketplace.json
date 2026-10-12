@@ -12,7 +12,7 @@
     {
       "name": "ike",
       "source": "./",
-      "description": "Commands for code hygiene, design critique and exploration, and pull request authoring.",
+      "description": "Commands for code hygiene, design critique and exploration, and pull request authoring, plus the Laconic output style.",
       "category": "workflow"
     }
   ]
