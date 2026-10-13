@@ -1,7 +1,7 @@
 {
   "name": "ike",
   "description": "Commands for code hygiene, design critique and exploration, and pull request authoring, plus the Laconic output style.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": {
     "name": "Kyle Scully",
     "email": "scullykns@gmail.com"
