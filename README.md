@@ -35,7 +35,8 @@ every cell under a DOM stub before you open anything.
 ## Laconic
 
 Output style: fewest words that keep the meaning. Leads from knowns to a point,
-defines terms, favors symbols (→ ⇒ ≈). Keeps Claude Code's coding instructions.
+defines terms, favors symbols (→ ⇒ ≈), nested lists, and tables for comparisons.
+Keeps Claude Code's coding instructions.
 
 Pick it in `/output-style`, or set `"outputStyle": "ike:Laconic"` in
 `settings.json`. The name is case-sensitive; `ike:laconic` silently does nothing.
