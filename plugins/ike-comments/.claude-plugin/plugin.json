@@ -1,0 +1,17 @@
+{
+  "name": "ike-comments",
+  "description": "Loads code comment rules into every session so Claude writes lean comments the first time.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Kyle Scully",
+    "email": "scullykns@gmail.com"
+  },
+  "homepage": "https://github.com/zieka/ike",
+  "repository": "https://github.com/zieka/ike",
+  "license": "MIT",
+  "keywords": [
+    "comments",
+    "hooks",
+    "code-review"
+  ]
+}

@@ -14,6 +14,12 @@
       "source": "./",
       "description": "Commands for code hygiene, design critique and exploration, and pull request authoring, plus the Laconic output style.",
       "category": "workflow"
+    },
+    {
+      "name": "ike-comments",
+      "source": "./plugins/ike-comments",
+      "description": "Opt-in. A SessionStart hook loads code comment rules into every session so Claude writes lean comments the first time.",
+      "category": "workflow"
     }
   ]
 }

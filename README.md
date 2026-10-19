@@ -42,6 +42,18 @@ comparisons. Keeps Claude Code's coding instructions.
 Pick it in `/output-style`, or set `"outputStyle": "ike:Laconic"` in
 `settings.json`. The name is case-sensitive; `ike:laconic` silently does nothing.
 
+## ike-comments
+
+Separate, opt-in plugin. A SessionStart hook loads
+`plugins/ike-comments/rules/comments.md` into every session, so Claude writes
+lean comments the first time instead of needing `/ike:reduce-comments` after.
+
+```
+/plugin install ike-comments@ike
+```
+
+Costs about 15 lines of context per session, in every project.
+
 ## Contributing
 
 `python3 scripts/validate.py` before you push. CI runs it on every PR.
