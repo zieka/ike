@@ -83,23 +83,53 @@ for path in styles:
     for key in frontmatter(path).keys() - STYLE_KEYS:
         err(str(path.relative_to(ROOT)), f"unknown frontmatter key {key!r}")
 
-# 6. Marketplace entries must not restate plugin.json metadata; the two drift.
+# 6. Each local marketplace entry needs a plugin.json with the same name, and
+#    must not restate its metadata; the two drift.
 try:
-    pj = json.loads((ROOT / ".claude-plugin/plugin.json").read_text())
     mj = json.loads((ROOT / ".claude-plugin/marketplace.json").read_text())
-    for i, entry in enumerate(mj.get("plugins", [])):
-        if entry.get("source") != "./":
-            continue
-        for key in ("version", "author", "homepage", "license"):
-            if key in entry and entry[key] == pj.get(key):
-                err(
-                    ".claude-plugin/marketplace.json",
-                    f"plugins[{i}].{key} duplicates plugin.json and will drift — omit it",
-                )
 except (OSError, json.JSONDecodeError):
-    pass  # already reported in check 1
+    mj = {}  # already reported in check 1
+plugin_dirs: list[pathlib.Path] = []
+for i, entry in enumerate(mj.get("plugins", [])):
+    src = entry.get("source")
+    if not isinstance(src, str) or not src.startswith("./"):
+        continue
+    where = f".claude-plugin/marketplace.json plugins[{i}]"
+    pdir = (ROOT / src).resolve()
+    try:
+        pj = json.loads((pdir / ".claude-plugin/plugin.json").read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        err(where, f"no readable plugin.json under {src}: {exc}")
+        continue
+    plugin_dirs.append(pdir)
+    if pj.get("name") != entry.get("name"):
+        err(where, f"name {entry.get('name')!r} differs from plugin.json name {pj.get('name')!r}")
+    for key in ("version", "author", "homepage", "license"):
+        if key in entry and entry[key] == pj.get(key):
+            err(where, f"{key} duplicates plugin.json and will drift — omit it")
 
-print(f"checked {len(commands)} command(s), {len(skills)} skill(s), {len(styles)} output style(s)")
+# 7. Hook commands must point at files that exist; a missing one fails only at
+#    session start, on the user's machine.
+for pdir in plugin_dirs:
+    hooks = pdir / "hooks/hooks.json"
+    if not hooks.is_file():
+        continue
+    rel = str(hooks.relative_to(ROOT))
+    text = hooks.read_text()
+    try:
+        json.loads(text)
+    except json.JSONDecodeError as exc:
+        err(rel, f"invalid JSON: {exc}")
+        continue
+    # REGEX: path after ${CLAUDE_PLUGIN_ROOT}/, up to a quote, backslash, or space
+    for target in re.findall(r"\$\{CLAUDE_PLUGIN_ROOT\}/([^\"'\\\s]+)", text):
+        if not (pdir / target).is_file():
+            err(rel, f"hook references missing file {target}")
+
+print(
+    f"checked {len(plugin_dirs)} plugin(s), {len(commands)} command(s), "
+    f"{len(skills)} skill(s), {len(styles)} output style(s)"
+)
 if errors:
     print(f"\n{len(errors)} problem(s):", file=sys.stderr)
     for e in errors:
