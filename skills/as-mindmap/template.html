@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+:root{
+  --bg:#fbfbfa; --fg:#2d2d2d; --dim:#8a8a8a; --line:#d6d6d6;
+  --code-bg:#e4e4e4; --code-fg:#333;
+  font-family:ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#18191b; --fg:#e3e3e3; --dim:#8d8d8d; --line:#3a3b3f; --code-bg:#34363b; --code-fg:#ececec; }
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; height:100%; overflow:hidden; background:var(--bg); color:var(--fg); -webkit-font-smoothing:antialiased; }
+
+#view{ position:fixed; inset:0; cursor:grab; touch-action:none; }
+#view.panning{ cursor:grabbing; }
+#map{ position:absolute; left:0; top:0; width:max-content; padding:48px; transform-origin:0 0; }
+#wires{ position:absolute; left:0; top:0; z-index:-1; overflow:visible; fill:none; stroke-linecap:round; }
+
+.node{ display:flex; align-items:center; }
+.kids{ flex:none; display:flex; flex-direction:column; gap:8px; margin-left:56px; }
+.collapsed > .kids{ display:none; }
+
+.label{
+  position:relative; flex:none; max-width:240px; padding:3px 2px 4px;
+  font-size:12.5px; line-height:1.42; overflow-wrap:anywhere;
+  border-bottom:2px solid var(--c);
+  cursor:text;
+}
+.branch > .label{ cursor:pointer; }
+.root > .label{
+  max-width:220px; padding:9px 14px; border:1.5px solid var(--line); border-radius:9px;
+  font-size:15px; font-weight:600; background:var(--bg);
+}
+/* Sits at the end of the underline, outside the label, so it never re-wraps the text. */
+.collapsed > .label::after{
+  content:attr(data-n); position:absolute; left:100%; bottom:-8px; margin-left:3px;
+  padding:0 6px; border-radius:9px; line-height:15px; white-space:nowrap;
+  font-size:10.5px; font-weight:600; color:#fff; background:var(--c, var(--dim));
+}
+.label:focus-visible{ outline:2px solid var(--c, var(--dim)); outline-offset:3px; }
+
+code{
+  font:11.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  padding:1px 4px; border-radius:3px; background:var(--code-bg); color:var(--code-fg);
+  -webkit-box-decoration-break:clone; box-decoration-break:clone;
+}
+
+#bar{ position:fixed; top:8px; right:8px; display:flex; gap:6px; padding:4px; border-radius:9px; background:var(--bg); }
+#bar button{
+  font:inherit; font-size:12px; padding:6px 10px; cursor:pointer;
+  color:var(--fg); background:var(--bg); border:1px solid var(--line); border-radius:6px;
+}
+#bar button:hover{ border-color:var(--dim); }
+#hint{ position:fixed; left:14px; bottom:10px; font-size:11.5px; color:var(--dim); pointer-events:none; }
+</style>
+</head>
+<body>
+<div id="view"><div id="map"><svg id="wires"></svg></div></div>
+<div id="bar">
+  <button data-act="fit" title="Fit the whole map in the window">Fit</button>
+  <button data-act="zoomOut" title="Zoom out">−</button>
+  <button data-act="zoomIn" title="Zoom in">+</button>
+  <button data-act="expand">Expand all</button>
+  <button data-act="collapse">Collapse all</button>
+  <button data-act="md" title="Download the markdown this map was built from">Download .md</button>
+</div>
+<div id="hint">Click a node to fold its branch · drag to pan · pinch or ⌘-scroll to zoom</div>
+
+<script type="application/json" id="tree">__TREE__</script>
+<script type="application/json" id="md">__MD__</script>
+<script type="application/json" id="file">__FILE__</script>
+<script>
+const data = id => JSON.parse(document.getElementById(id).textContent);
+const TREE = data("tree"), MD = data("md"), FILE = data("file");
+const PALETTE = ["#e8833a", "#3d8fd1", "#7a5bc7", "#e2b318", "#d9534f", "#2aa198", "#5a9e3c", "#c45a9b"];
+const view = document.getElementById("view");
+const map = document.getElementById("map");
+const wires = document.getElementById("wires");
+
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+// Escape before adding <code> so placeholders like <agent> stay literal.
+const fmt = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+const size = n => n.c.reduce((sum, k) => sum + 1 + size(k), 0);
+
+function build(n, color) {
+  const node = document.createElement("div");
+  const label = document.createElement("div");
+  node.className = "node";
+  label.className = "label";
+  label.innerHTML = fmt(n.t);
+  node.append(label);
+  if (color) {
+    node.style.setProperty("--c", color);
+    node.dataset.c = color;
+  }
+  if (n.c.length) {
+    node.classList.add("branch");
+    label.tabIndex = 0;
+    label.dataset.n = "+" + size(n);
+    const kids = document.createElement("div");
+    kids.className = "kids";
+    n.c.forEach((k, i) => kids.append(build(k, color || PALETTE[i % PALETTE.length])));
+    node.append(kids);
+  }
+  return node;
+}
+
+const root = build(TREE);
+root.classList.add("root");
+map.append(root);
+
+// Wires run from the end of a parent's underline to the start of each child's.
+function draw() {
+  const paths = [];
+  (function walk(node) {
+    const kids = node.children[1];
+    if (!kids || node.classList.contains("collapsed")) return;
+    const p = node.firstChild, isRoot = node === root;
+    const x1 = p.offsetLeft + p.offsetWidth;
+    const y1 = p.offsetTop + (isRoot ? p.offsetHeight / 2 : p.offsetHeight - 1);
+    for (const kid of kids.children) {
+      const c = kid.firstChild;
+      const x2 = c.offsetLeft, y2 = c.offsetTop + c.offsetHeight - 1, mid = (x1 + x2) / 2;
+      paths.push(`<path d="M${x1} ${y1}C${mid} ${y1} ${mid} ${y2} ${x2} ${y2}" stroke="${kid.dataset.c}" stroke-width="${isRoot ? 2.5 : 1.5}"/>`);
+      walk(kid);
+    }
+  })(root);
+  wires.setAttribute("width", map.offsetWidth);
+  wires.setAttribute("height", map.offsetHeight);
+  wires.innerHTML = paths.join("");
+}
+
+let x = 0, y = 0, s = 1, drag = null;
+const apply = () => { map.style.transform = `translate(${x}px, ${y}px) scale(${s})`; };
+
+function zoomAt(f, px, py) {
+  const next = Math.min(3, Math.max(0.15, s * f));
+  x = px - (px - x) * next / s;
+  y = py - (py - y) * next / s;
+  s = next;
+  apply();
+}
+
+function fit() {
+  const w = map.offsetWidth, h = map.offsetHeight;
+  s = Math.min(innerWidth / w, innerHeight / h, 1);
+  x = (innerWidth - w * s) / 2;
+  y = (innerHeight - h * s) / 2;
+  apply();
+}
+
+// A big map fits only at an unreadable scale, so start at 100% with the root at left center.
+function home() {
+  if (Math.min(innerWidth / map.offsetWidth, innerHeight / map.offsetHeight) >= 0.6) return fit();
+  const r = root.firstChild;
+  s = 1;
+  x = 0;
+  y = innerHeight / 2 - (r.offsetTop + r.offsetHeight / 2);
+  apply();
+}
+
+// Keep the clicked label still while the tree re-centers around it.
+function toggle(label) {
+  const before = label.offsetTop;
+  label.parentNode.classList.toggle("collapsed");
+  draw();
+  y += (before - label.offsetTop) * s;
+  apply();
+}
+
+function setAll(collapsed) {
+  for (const n of map.querySelectorAll(".branch")) n.classList.toggle("collapsed", collapsed && n !== root);
+  draw();
+  home();
+}
+
+view.addEventListener("pointerdown", e => {
+  // Drags that start on a label select its text instead, so commands can be copied.
+  if (e.button !== 0 || e.target.closest(".label")) return;
+  e.preventDefault();
+  drag = { x: e.clientX - x, y: e.clientY - y };
+  view.setPointerCapture(e.pointerId);
+  view.classList.add("panning");
+});
+view.addEventListener("pointermove", e => {
+  if (!drag) return;
+  x = e.clientX - drag.x;
+  y = e.clientY - drag.y;
+  apply();
+});
+const endDrag = () => { drag = null; view.classList.remove("panning"); };
+view.addEventListener("pointerup", endDrag);
+view.addEventListener("pointercancel", endDrag);
+
+view.addEventListener("wheel", e => {
+  e.preventDefault();
+  const k = e.deltaMode === 1 ? 16 : 1;  // Firefox mouse wheels report lines, not pixels
+  // Trackpad pinch arrives as ctrl+wheel.
+  if (e.ctrlKey || e.metaKey) {
+    zoomAt(Math.exp(-Math.max(-50, Math.min(50, e.deltaY * k)) / 100), e.clientX, e.clientY);
+  } else {
+    x -= e.deltaX * k;
+    y -= e.deltaY * k;
+    apply();
+  }
+}, { passive: false });
+
+map.addEventListener("click", e => {
+  const label = e.target.closest(".branch > .label");
+  if (label && !String(getSelection())) toggle(label);
+});
+map.addEventListener("keydown", e => {
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches(".branch > .label")) {
+    e.preventDefault();
+    toggle(e.target);
+  }
+});
+
+const ACTIONS = {
+  fit,
+  zoomIn: () => zoomAt(1.25, innerWidth / 2, innerHeight / 2),
+  zoomOut: () => zoomAt(0.8, innerWidth / 2, innerHeight / 2),
+  expand: () => setAll(false),
+  collapse: () => setAll(true),
+  md() {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([MD], { type: "text/markdown" }));
+    a.download = FILE;
+    a.click();
+  },
+};
+document.getElementById("bar").addEventListener("click", e => {
+  const act = e.target.closest("button")?.dataset.act;
+  if (act) ACTIONS[act]();
+});
+
+draw();
+home();
+document.fonts.ready.then(draw);
+</script>
+</body>
+</html>

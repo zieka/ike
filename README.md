@@ -20,17 +20,28 @@ A Claude Code plugin marketplace for the commands I actually use.
 | command | `/ike:design-critique` | red-teaming a design |
 | command | `/ike:pr-description-template` | writing a PR body |
 | skill | `/ike:design-grid` | comparing design variants |
+| skill | `/ike:as-mindmap <feature>` | explaining a feature as a question/answer mind map |
 | output style | `/output-style` → `ike:Laconic` | fewest words, plain language |
 
 Each carries its own description — `/help` and the command picker show them.
 
 ## design-grid
 
-The only one with moving parts. It renders a two-axis grid of variants into a
-single self-contained `.html` file under `~/Documents/design-grids/`.
+Renders a two-axis grid of variants into a single self-contained `.html` file
+under `~/Documents/design-grids/`.
 
 Requires `python3` and `node`. Node runs the `--check` pass, which evaluates
 every cell under a DOM stub before you open anything.
+
+## as-mindmap
+
+Explains one feature to someone who missed its design: what it is, how to use
+it, and why it works that way. Every node is a question or an answer to one;
+answers branch only into follow-up questions.
+
+Writes `~/Documents/mindmaps/<date>-<slug>.md` and a self-contained `.html`
+beside it: no network requests, shareable in Slack, with a button to download
+the `.md`. Requires `python3`.
 
 ## Laconic
 
