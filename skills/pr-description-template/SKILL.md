@@ -1,5 +1,7 @@
 ---
+name: pr-description-template
 description: "PR description structure: Problem, Objectives, and collapsed Assumptions / Changes / Notes."
+disable-model-invocation: true
 ---
 
 # PR description structure (use these exact headings and `<details>` wrappers)

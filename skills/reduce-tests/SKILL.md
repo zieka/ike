@@ -1,5 +1,7 @@
 ---
+name: reduce-tests
 description: Prune tests TDD left behind — keep only those that name a specific bug they would catch in production.
+disable-model-invocation: true
 ---
 
 test driven development is a great way to iterate but often it leaves behind tests that were good for building but serve little purpose later.

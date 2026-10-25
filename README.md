@@ -24,10 +24,10 @@ See [Codex](#codex) for what carries over.
 
 | | Invoke | For |
 |---|---|---|
-| command | `/ike:reduce-comments` | pruning comments |
-| command | `/ike:reduce-tests` | pruning tests |
-| command | `/ike:design-critique` | red-teaming a design |
-| command | `/ike:pr-description-template` | writing a PR body |
+| skill | `/ike:reduce-comments` | pruning comments |
+| skill | `/ike:reduce-tests` | pruning tests |
+| skill | `/ike:design-critique` | red-teaming a design |
+| skill | `/ike:pr-description-template` | writing a PR body |
 | skill | `/ike:design-grid` | comparing design variants |
 | skill | `/ike:as-mindmap <feature>` | explaining a feature as a question/answer mind map |
 | output style | `/output-style` → `ike:Laconic` | fewest words, plain language |
@@ -80,8 +80,7 @@ Codex reads `.claude-plugin/` directly; there is no separate Codex manifest.
 
 | | In Codex |
 |---|---|
-| skills | ✓ `ike:design-grid`, `ike:as-mindmap` |
-| commands | become skills named `ike:source-command-<name>` |
+| skills | ✓ same names; Codex ignores `disable-model-invocation`, so it may start any of them on its own |
 | Laconic | ✗ Codex has no output styles |
 | ike-comments | unverified; or paste `plugins/ike-comments/rules/comments.md` into `~/.codex/AGENTS.md` |
 
