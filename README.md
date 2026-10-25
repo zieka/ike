@@ -11,14 +11,23 @@ A Claude Code plugin marketplace for the commands I actually use.
 /plugin install ike@ike
 ```
 
+Codex reads the same marketplace:
+
+```
+codex plugin marketplace add zieka/ike
+codex plugin add ike@ike
+```
+
+See [Codex](#codex) for what carries over.
+
 ## What you get
 
 | | Invoke | For |
 |---|---|---|
-| command | `/ike:reduce-comments` | pruning comments |
-| command | `/ike:reduce-tests` | pruning tests |
-| command | `/ike:design-critique` | red-teaming a design |
-| command | `/ike:pr-description-template` | writing a PR body |
+| skill | `/ike:reduce-comments` | pruning comments |
+| skill | `/ike:reduce-tests` | pruning tests |
+| skill | `/ike:design-critique` | red-teaming a design |
+| skill | `/ike:pr-description-template` | writing a PR body |
 | skill | `/ike:design-grid` | comparing design variants |
 | skill | `/ike:as-mindmap <feature>` | explaining a feature as a question/answer mind map |
 | output style | `/output-style` → `ike:Laconic` | fewest words, plain language |
@@ -64,6 +73,16 @@ lean comments the first time instead of needing `/ike:reduce-comments` after.
 ```
 
 Costs about 15 lines of context per session, in every project.
+
+## Codex
+
+Codex reads `.claude-plugin/` directly; there is no separate Codex manifest.
+
+| | In Codex |
+|---|---|
+| skills | ✓ same names; Codex ignores `disable-model-invocation`, so it may start any of them on its own |
+| Laconic | ✗ Codex has no output styles |
+| ike-comments | unverified; or paste `plugins/ike-comments/rules/comments.md` into `~/.codex/AGENTS.md` |
 
 ## Contributing
 

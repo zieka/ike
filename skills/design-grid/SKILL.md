@@ -96,6 +96,8 @@ python3 ${CLAUDE_SKILL_DIR}/build.py <spec.js> \
   -o ~/Documents/design-grids/YYYY-MM-DD-<rows>-x-<cols>.html --check
 ```
 
+`${CLAUDE_SKILL_DIR}` empty (Codex) → use this SKILL.md's directory.
+
 **Always pass `--check`.** It evaluates the bundle under a DOM stub in node and fails on any
 cell that throws, before the user opens anything.
 

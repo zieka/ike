@@ -84,6 +84,8 @@ Content:
 python3 ${CLAUDE_SKILL_DIR}/build.py ~/Documents/mindmaps/YYYY-MM-DD-<slug>.md
 ```
 
+`${CLAUDE_SKILL_DIR}` empty (Codex) → use this SKILL.md's directory.
+
 A rule break fails with the line number → fix the `.md`, rebuild. An unanswered question only
 warns; answer it or cut it.
 
