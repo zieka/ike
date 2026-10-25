@@ -1,5 +1,5 @@
 ---
-description: PR description structure: Problem, Objectives, and collapsed Assumptions / Changes / Notes.
+description: "PR description structure: Problem, Objectives, and collapsed Assumptions / Changes / Notes."
 ---
 
 # PR description structure (use these exact headings and `<details>` wrappers)

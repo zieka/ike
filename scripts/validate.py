@@ -83,7 +83,14 @@ for path in styles:
     for key in frontmatter(path).keys() - STYLE_KEYS:
         err(str(path.relative_to(ROOT)), f"unknown frontmatter key {key!r}")
 
-# 6. Each local marketplace entry needs a plugin.json with the same name, and
+# 6. Frontmatter must be strict YAML. Claude Code tolerates an unquoted `: ` in
+#    a value; Codex drops the whole file with no warning.
+for path in commands + skills + styles:
+    for key, value in frontmatter(path).items():
+        if ": " in value and value[:1] not in "\"'":
+            err(str(path.relative_to(ROOT)), f"{key!r} value has unquoted ': ' — quote it")
+
+# 7. Each local marketplace entry needs a plugin.json with the same name, and
 #    must not restate its metadata; the two drift.
 try:
     mj = json.loads((ROOT / ".claude-plugin/marketplace.json").read_text())
@@ -108,7 +115,7 @@ for i, entry in enumerate(mj.get("plugins", [])):
         if key in entry and entry[key] == pj.get(key):
             err(where, f"{key} duplicates plugin.json and will drift — omit it")
 
-# 7. Hook commands must point at files that exist; a missing one fails only at
+# 8. Hook commands must point at files that exist; a missing one fails only at
 #    session start, on the user's machine.
 for pdir in plugin_dirs:
     hooks = pdir / "hooks/hooks.json"

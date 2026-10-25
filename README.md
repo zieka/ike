@@ -11,6 +11,15 @@ A Claude Code plugin marketplace for the commands I actually use.
 /plugin install ike@ike
 ```
 
+Codex reads the same marketplace:
+
+```
+codex plugin marketplace add zieka/ike
+codex plugin add ike@ike
+```
+
+See [Codex](#codex) for what carries over.
+
 ## What you get
 
 | | Invoke | For |
@@ -64,6 +73,17 @@ lean comments the first time instead of needing `/ike:reduce-comments` after.
 ```
 
 Costs about 15 lines of context per session, in every project.
+
+## Codex
+
+Codex reads `.claude-plugin/` directly; there is no separate Codex manifest.
+
+| | In Codex |
+|---|---|
+| skills | ✓ `ike:design-grid`, `ike:as-mindmap` |
+| commands | become skills named `ike:source-command-<name>` |
+| Laconic | ✗ Codex has no output styles |
+| ike-comments | unverified; or paste `plugins/ike-comments/rules/comments.md` into `~/.codex/AGENTS.md` |
 
 ## Contributing
 
