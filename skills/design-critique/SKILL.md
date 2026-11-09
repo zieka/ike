@@ -1,7 +1,6 @@
 ---
 name: design-critique
 description: Adversarial design critique in the style of Connor & Irizarry's Discussing Design.
-disable-model-invocation: true
 ---
 
 Start a design critique in the style of Adam Connor & Aaron Irizarry’s Discussing Design.

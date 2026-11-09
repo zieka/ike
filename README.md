@@ -80,7 +80,7 @@ Codex reads `.claude-plugin/` directly; there is no separate Codex manifest.
 
 | | In Codex |
 |---|---|
-| skills | ✓ same names; Codex ignores `disable-model-invocation`, so it may start any of them on its own |
+| skills | ✓ same names |
 | Laconic | ✗ Codex has no output styles |
 | ike-comments | unverified; or paste `plugins/ike-comments/rules/comments.md` into `~/.codex/AGENTS.md` |
 

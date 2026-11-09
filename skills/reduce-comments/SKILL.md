@@ -1,7 +1,6 @@
 ---
 name: reduce-comments
 description: Cut new code comments down to what earns its place — why over what, inline over doc blocks, standard labels.
-disable-model-invocation: true
 ---
 
 of the new code lets reduce the word count on the code comments.
